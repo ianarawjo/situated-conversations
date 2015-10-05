@@ -1,0 +1,47 @@
+#
+# TEMPLATES OF SITUATED CONVERSATIONS
+# -----------------------------------
+# The following is a 'basic' set of sample conversations
+# common in multiple cultures.
+#
+# * Notation: Names with all-capitals refer to conversations,
+# * names with first capitalization refer to dialog realizations.
+
+Polite-Greeting :-
+    A: Greetings(B), Bow(B)
+
+Mutual-Greeting :-
+    A: Polite-Greeting(B),
+    B: Polite-Greeting(A)
+    where facing(A, B)
+
+Expanded-Greeting :-
+    A: Greetings(B), HowAreYou(B),
+    B: AmWell(B), HowAreYou(A),
+    A: AmWell(A)
+
+First-Meeting :-
+    A: NiceToMeet(B),
+    A: AreYou(B, student)?
+    B: YesNo(student), NiceToMeetToo(A)
+
+Restaurant-Order(rest_cat) :-
+    W: AskOrder(A),
+    A: AssertOrder(rest_cat)
+    where sitting(A) and standing(W) and facing(A, W)
+
+Point-At :-
+    A: Assert(Entity)
+    where is_entity(Entity), near(Entity, A), facing(A, Entity), perform_action(A, point)
+
+Assert = { 'This is {a, the} X.' | singular(X),
+            'That is {a, the} X.' | singular(X),
+            'Those are X.' | plural(X) }
+
+Bow :-
+    perform_action(A, bow)
+
+near(A, B, D=10) :-
+    at(A, L), at(B, L), dist(A, B) < D
+facing(A, B) :-
+    lookat(A, B), lookat(B, A)

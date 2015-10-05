@@ -1,0 +1,112 @@
+
+# In the below examples, the top-level is a function
+# with implied arguments S and R, for Sender and Receiver(s), respectively.
+# You can insert S and R inside quotes to refer to a name.
+# Note that R can also be PLURAL. If plural, the algorithm will realize
+# all recipient names, conjunction'd with AND. If you think a pronoun is also
+# appropriate in the dialog, use P e.g. "[S, P] went to the mall."
+#
+# (Periods are not strictly necessary.)
+#
+# One goal is to eventually run all possible sentences through a weighted CCG
+# to obtain a set of semantic representations. These could then be used as the target semantic form
+# over a weighted CCG in another language taken from online data. Semantic matches
+# could automatically generate a new set of template realizations, but in the new language.
+#
+# SITUATIONAL DETERMINISM
+# The idea behind 'situational determinism' is that the situation, or current world-state,
+# determines the space of conversations that can occur. This includes which characters are in play.
+# Conversations that share a common predicate, e.g. building(restaurant),
+# automatically induce the 'domain' under which they can be realized. Thus the predicates
+# themselves -- which represent the situation -- determine the set of conversations.
+# More importantly, they can be used to _initialize the world-state_ such that certain conversations
+# arise. This includes positioning characters, entities, etc. Another way of saying it is that
+# the logical form represents a set of situational constraints that are used to generate the world.
+#
+# In a contextual language-learning game, our primary goal is to decide which aspects of the language
+# the player must learn next. These aspects are various, and must be 'taxonomized' elsewhere.
+# However, say we have this mysterious algorithm which picks a set of possible realizations
+# which could teach the player a bit more about the language.
+#
+# Think of situations as LFs, and LFs as being 'coarse' or 'fine' with respect to
+# how much they presume about the world-state. For instance, the greeting 'Hello' does not presume much.
+# In this way, it may be useful to teach the player, if their corresponding KB is similarly coarse.
+# Suppose now that the player knows 'common' phrases (ones without many conditionals). We can
+# decide on the next dialogues to present based on how specific those dialogues are.
+# Consider the predicate time(X). Querying the database (the query is a 'situation') results
+# in a set of possible realizations that rely upon a fixed X, such as morning, day, night.
+# Similarly, we could query time(morning) to obtain the set of dialogue dependent on
+# the time of day being morning.
+#
+# Now consider building(restaurant) again. We could call this determinism 'a domain',
+# but that seems reductionist, because the domain can be set as fine or coarse as the underlying
+# KB allows. Here is a definition of a 'seafood restaurant':
+#       building(restaurant) and food(X) -> seafood(X).
+# The above is an example of additional specificity: if item X in the category of food
+# appears, X must also be in the category seafood.
+#
+# Consider other situations like the one in Crystallize's intro:
+#       (student(X) or professor(X)) and building(school)
+# Notice that this merely LIMITS what conversations can occur, but does not COMPLETELY DEFINE them.
+# For instance, characters can still ask 'How are you?' at school (or wherever), because 'How are you?' only
+# requires that the characters know one another. In other words, any dialogue with a conditional (LF)
+# that DOES NOT CONTRADICT the situational constraint can be chosen. (However, all characters
+# involved must be either students or professors, and the scene must be school.)
+#
+# Thus we can separate the set of dialogue dependent on the situation from the set
+# independent of it. The dependent conversations can be given corresponding weights --
+# higher priorities -- than the 'common' phrases. (In fact we can quantify how 'common'
+# a phrase is by examining the extent of its conditionals.)
+#
+# You may be wondering where the place is for situations to evolve over time --
+# for instance, a player finding a character's lost puppy. We can branch naturally
+# in dialogue using conditionals has(player, puppy) and not has(player, puppy). When
+# the player finds the puppy, the set of dialogue under consideration must dynamically
+# change to reflect this new state of the world.
+#
+# These changes can occur at a smaller scale, even within conversations.
+# A predicate conversation_state(A, B, topic(X)), fixed for some X, could denote
+# the state of the conversation between characters A and B. We could imagine the states
+# changing relationships between characters, changing what items they hold, their emotion,
+# their behavior, etc. With the addition of a -o operation as seen in Ceptre
+# [http://www.cs.cmu.edu/~cmartens/thesis/], we could achieve non-linear generation
+# of new states from previous ones; i.e., if two characters A and B are on a date and A
+# says something offensive, B could get angry and:
+#   on_date(A, B) and angry(A, B) -o angry(A, B) and walk_out(B)
+# But it is unclear the extent to which we'd want to push this.
+
+# Prolog-style predicate definitions for common conditions.
+close(S, R) :- friends(S, R) or family(S, R)
+
+--- OPENERS ---
+# Below three openers thanks to http://www.fluentu.com/english/blog/english-greetings-expressions/.
+Greetings:
+    "[Hey, Hi, Hello] [R, 0].", # means CHOOSE 1 of [Hey, Hi, Hello] and CHOOSE 1 of [R, 0] where 0 stands in for the null set. Note if that S does not know R, choice defaults to 0.
+    "Good morning [R, 0]." | time(morning),
+    "Good afternoon [R, 0]." | time(afternoon),
+    "Good evening [R, 0]." | time(evening),
+    "'Morning." | time(morning) and close(S, R),
+    "'Afternoon." | time(afternoon) and close(S, R),
+    "['R!', 0] Long time no see!" | close(S, R) and days_since_last_meeting(S, R) > 4
+
+MeetFirstTime:
+    where not met(S, R):
+    "It's [nice, good] to meet you [', R', 0].",
+    "Pleasure to meet you [', R', 0]."
+
+HowAreYou where havemet(S, R):
+    "How are you?",
+    "How have you been?",
+    "How are things?",
+    "How's everything?",
+    "How's your day going?" | time(afternoon),
+    "How was your day?" | time(evening),
+    "What's [up, going on]?" | close(S, R)
+Response to HowAreYou:
+    "[I am, I'm] fine.",
+    "[Doing, 0] fine, thank you.",
+
+--- OPENER RESPONSES ---
+RespondGreetings:
+    Greetings,
+    HowAreYou
