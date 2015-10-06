@@ -68,7 +68,7 @@
 # A predicate conversation_state(A, B, topic(X)), fixed for some X, could denote
 # the state of the conversation between characters A and B. We could imagine the states
 # changing relationships between characters, changing what items they hold, their emotion,
-# their behavior, etc. With the addition of a -o operation as seen in Ceptre
+# their behavior, etc. With the addition of a -o operation a la Ceptre
 # [http://www.cs.cmu.edu/~cmartens/thesis/], we could achieve non-linear generation
 # of new states from previous ones; i.e., if two characters A and B are on a date and A
 # says something offensive, B could get angry and:
@@ -91,8 +91,8 @@ Greetings:
 
 MeetFirstTime:
     where not met(S, R):
-    "It's [nice, good] to meet you [', R', 0].",
-    "Pleasure to meet you [', R', 0]."
+        "It's [nice, good] to meet you [', R', 0].",
+        "Pleasure to meet you [', R', 0]."
 
 HowAreYou where havemet(S, R):
     "How are you?",
@@ -103,10 +103,17 @@ HowAreYou where havemet(S, R):
     "How was your day?" | time(evening),
     "What's [up, going on]?" | close(S, R)
 Response to HowAreYou:
-    "[I am, I'm] fine.",
-    "[Doing, 0] fine, thank you.",
+    where not emotion(S, sad):
+        "I'm fine.",
+        "[Doing, 0] fine, thank you.",
+    else:
+        "Not too good."
 
---- OPENER RESPONSES ---
-RespondGreetings:
-    Greetings,
-    HowAreYou
+--- RESTAURANT EXAMPLE ---
+where building(restaurant):
+    AskOrder:
+        "What would you like?"
+    Response to AskOrder:
+        where food(X) or drink(X):
+            "I'll have [X].",
+            "I'd like [X]."
