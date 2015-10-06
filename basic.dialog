@@ -25,7 +25,7 @@
 #
 # In a contextual language-learning game, our primary goal is to decide which aspects of the language
 # the player must learn next. These aspects are various, and must be 'taxonomized' elsewhere.
-# However, say we have this mysterious algorithm which picks a set of possible realizations
+# However, say we have this mysterious algorithm which _ranks_ a set of possible realizations
 # which could teach the player a bit more about the language.
 #
 # Think of situations as LFs, and LFs as being 'coarse' or 'fine' with respect to
