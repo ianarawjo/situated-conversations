@@ -1,4 +1,11 @@
 
+# Gabe's comments on notation: Two things:
+#  - How do you know that we can model conversations which aren't like those found in phrase-books?
+#       -> I.e. 'where did the dialog dependencies go?' 'where are the social constraints, rather than situational?'
+#  - Japanese has many homophones. How can the conversation writer define which homophone they mean?
+#       -> Might not be possible to use purely text-based input method...
+#       -> Maybe text editor with underlying dictionary graph? Hide extra information.
+
 # In the below examples, the top-level is a function
 # with implied arguments S and R, for Sender and Receiver(s), respectively.
 # You can insert S and R inside quotes to refer to a name.
